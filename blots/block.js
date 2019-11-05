@@ -179,7 +179,18 @@ function blockDelta(blot) {
 function bubbleFormats(blot, formats = {}) {
   if (blot == null) return formats;
   if (typeof blot.formats === 'function') {
-    formats = extend(formats, blot.formats());
+    if (blot.statics.preserveTree) {
+      // safe iteration without overwriting
+      const values = blot.formats();
+      const keys = Object.keys(values);
+      for (let i = 0; i < keys.length; i += 1) {
+        if (typeof formats[keys[i]] === 'undefined') {
+          formats[keys[i]] = values[keys[i]];
+        }
+      }
+    } else {
+      formats = extend(formats, blot.formats());
+    }
   }
   if (
     blot.parent == null ||
